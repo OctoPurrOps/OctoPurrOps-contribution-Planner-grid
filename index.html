@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Contribution Planner — Pixel Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css"/>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="pixelPanel top">
+      <div class="brand">
+        <h1>CONTRIBUTION PLANNER</h1>
+
+        <div class="profileStrip">
+          <div class="pixelGitHub" id="pixelGitHub" title="Open GitHub"></div>
+
+          <div class="profileCard">
+            <div class="profileTop">
+              <canvas id="avatarPix" width="64" height="64" aria-label="Profile avatar"></canvas>
+              <div>
+                <div class="profileName" id="pName">OctoPurrOps</div>
+                <a class="profileLink" id="pLink" href="https://github.com/OctoPurrOps" target="_blank" rel="noreferrer">
+                  github.com/OctoPurrOps
+                </a>
+                <div class="profileMeta" id="pMeta">Loading profile…</div>
+              </div>
+            </div>
+
+            <div class="profileBottom">
+              <a class="profileRepo" id="pRepo" href="https://github.com/OctoPurrOps" target="_blank" rel="noreferrer">Latest repo: —</a>
+              <button class="secondary tinyBtn" id="toggleCRT">CRT</button>
+              <button class="secondary tinyBtn" id="toggleParty">PARTY</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud">
+          <div class="chip">Drag paint • Right-click erase</div>
+          <div class="chip"><span class="kbd">Shift</span> + click (month) = erase</div>
+          <div class="chip">Type <span class="kbd">MEOW</span> = PARTY</div>
+        </div>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <div class="hud">
+        <label>Start (Sun)
+          <input id="startDate" type="date"/>
+        </label>
+
+        <label>Weeks
+          <input id="weeks" type="number" min="10" max="60" value="53"/>
+        </label>
+
+        <label>Paint
+          <select id="level">
+            <option value="0">0 (erase)</option>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4 (max)</option>
+          </select>
+        </label>
+
+        <button class="secondary" id="todayBtn">TODAY</button>
+        <button class="secondary" id="clearBtn">CLEAR</button>
+        <button class="secondary" id="invertBtn">INVERT</button>
+
+        <button id="exportJsonBtn">JSON</button>
+        <button id="exportCsvBtn">CSV</button>
+        <button id="exportIcsBtn">ICAL</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="pixelPanel left">
+    <div class="gridHeader">
+      <div>
+        <h2 class="sectionTitle">HEATMAP GRID</h2>
+        <div class="tiny">Compact view. Right panel scrolls.</div>
+      </div>
+      <div class="meta" id="metaText">—</div>
+    </div>
+
+    <div class="board">
+      <div class="days" id="days"></div>
+
+      <div class="heatWrap">
+        <div class="monthsRow" id="monthsRow"></div>
+        <canvas id="heat"></canvas>
+
+        <div class="gridHelp">
+          <div class="legend">
+            <span class="sw" style="background:var(--lv0)"></span>
+            <span class="sw" style="background:var(--lv1)"></span>
+            <span class="sw" style="background:var(--lv2)"></span>
+            <span class="sw" style="background:var(--lv3)"></span>
+            <span class="sw" style="background:var(--lv4)"></span>
+          </div>
+          <div class="tiny" id="hoverHint">Hover a square to see date.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="pixelPanel right">
+    <div class="stack">
+
+      <section class="card">
+        <div class="calendarTop">
+          <div>
+            <h2 class="sectionTitle">MONTH VIEW</h2>
+            <div class="calMonth" id="calMonthLabel">—</div>
+          </div>
+          <div class="calNav">
+            <button class="secondary" id="prevMonthBtn">◀</button>
+            <button class="secondary" id="nextMonthBtn">▶</button>
+          </div>
+        </div>
+        <div class="calendar" id="calendar"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="sectionTitle">TEXT → PIXELS</h2>
+        <div class="tiny">Stamp text into the 7×weeks grid.</div>
+        <div style="height:8px"></div>
+
+        <textarea id="textIn" placeholder="HELLO&#10;OCTOPURROPS"></textarea>
+
+        <div style="height:10px"></div>
+
+        <div class="sliderWrap">
+          <label style="flex:1; justify-content:space-between;">
+            Size
+            <input id="textSize" type="range" min="6" max="22" value="10"/>
+          </label>
+          <span class="chip" id="textSizeLabel">10px</span>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <label>X <input id="textX" type="number" min="0" max="60" value="1" style="width:90px"/></label>
+          <label>Y <input id="textY" type="number" min="0" max="6" value="0" style="width:90px"/></label>
+          <label>Threshold <input id="textThresh" type="number" min="1" max="254" value="80" style="width:100px"/></label>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <button class="secondary" id="textPreviewBtn">PREVIEW</button>
+          <button id="textStampBtn">STAMP</button>
+          <button class="secondary" id="textClearBtn">CLEAR PREVIEW</button>
+        </div>
+
+        <div style="height:10px"></div>
+        <canvas id="textPreview" style="width:100%; height:auto; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.18);"></canvas>
+      </section>
+
+      <section class="card">
+        <h2 class="sectionTitle">IMAGE → PIXELS</h2>
+        <div class="tiny">Load an image and map it into the grid.</div>
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <input id="imgFile" type="file" accept="image/*" />
+          <button class="secondary" id="imgClearBtn">CLEAR</button>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <label>Mode
+            <select id="imgMode">
+              <option value="brightness" selected>Brightness</option>
+              <option value="alpha">Alpha</option>
+            </select>
+          </label>
+
+          <label>Invert
+            <select id="imgInvert">
+              <option value="0" selected>No</option>
+              <option value="1">Yes</option>
+            </select>
+          </label>
+
+          <label>Threshold
+            <input id="imgThresh" type="number" min="0" max="255" value="30" style="width:100px"/>
+          </label>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <button class="secondary" id="imgPreviewBtn">PREVIEW</button>
+          <button id="imgStampBtn">STAMP</button>
+        </div>
+
+        <div style="height:10px"></div>
+        <canvas id="imgPreview" style="width:100%; height:auto; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.18);"></canvas>
+      </section>
+
+      <section class="card">
+        <h2 class="sectionTitle">FUN + SETTINGS</h2>
+        <div class="tiny">Filters + mirror paint + beeps.</div>
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <button class="secondary" id="fxNoiseBtn">NOISE</button>
+          <button class="secondary" id="fxDitherBtn">DITHER</button>
+          <button class="secondary" id="fxShiftBtn">SHIFT→</button>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <button class="secondary" id="fxFlipBtn">FLIP</button>
+          <button class="secondary" id="fxPulseBtn">PULSE</button>
+          <button class="danger" id="fxChaosBtn">CHAOS</button>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="row">
+          <label>Beep
+            <select id="beep">
+              <option value="0" selected>Off</option>
+              <option value="1">On</option>
+            </select>
+          </label>
+
+          <label>Mirror paint
+            <select id="mirror">
+              <option value="0" selected>Off</option>
+              <option value="1">On</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="row" style="margin-bottom:10px;">
+          <h2 class="sectionTitle" style="margin:0;">OUTPUT</h2>
+          <div class="chip" id="statsPill">—</div>
+        </div>
+        <div class="info" id="dayInfo">Hover a square or click a calendar day.</div>
+        <div style="height:10px"></div>
+        <pre id="out">Paint some squares.</pre>
+      </section>
+
+    </div>
+  </aside>
+</main>
+</body>
+</html>
